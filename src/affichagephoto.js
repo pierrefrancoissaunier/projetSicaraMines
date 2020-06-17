@@ -86,28 +86,19 @@ export default class AffichePhotoGallery extends React.Component {
             const result = await manipulateAsync(
                 this.state.image.uri,
                 [{ resize: { width: 32, height: 32 } }],
-                { compress: 1, format: SaveFormat.JPEG }
+                { compress: 1, format: SaveFormat.JPEG },
             );
-            const fileUri = result.uri;
-            console.log('originale', this.state.image.uri);
-            console.log('RESIZED', fileUri);     
+            
+            const fileUri = result.uri;   
             const imgB64 = await FileSystem.readAsStringAsync(fileUri, {
                 encoding: FileSystem.EncodingType.Base64,
             });
             const imgBuffer = tf.util.encodeString(imgB64, 'base64').buffer;
             const raw = new Uint8Array(imgBuffer)  
-            const imageTensor = decodeJpeg(raw);
-            const imageTensor2 = imageTensor.expandDims();
-        
-
-        // const uri = this.state.image;
-        // const response = await fetch(uri, {}, { isBinary: true });
-        // const imageData = await response.arrayBuffer();
-        // const imageTensor = decodeJpeg(imageData);
-
-        const predictions = (await this.localModel.predict(imageTensor2));
-        // this.setState({ predictions });
-        console.log('predictions', predictions)
+            const imageTensor = decodeJpeg(raw).expandDims();
+            const predictions = (await this.localModel.predict(imageTensor).array());
+            // this.setState({ predictions });
+            console.log('predictions : ', predictions[0])
         }   
          catch (error) {
             console.log(error)
@@ -121,13 +112,15 @@ export default class AffichePhotoGallery extends React.Component {
         if (!predictions){
             return(
                 <ImageBackground source={item} style={styles.preview}>
-                    {(isTfReady && isModelReady) ? 
+                    
+                    {(isTfReady && isModelReady) ? // test ternaire pas facile à lire 
                     <TouchableOpacity style={styles.confirmButton} onPress={ () => {
-                        this.classifyImageLocal();
-                        console.log("this.state.imageLOL",this.state.image) }}>
+                        this.classifyImage()
+                    }}>
                         <Ionicons name="ios-send" color="white" size={60} />
                     </TouchableOpacity>
-                    : <Text style={styles.confirmButton}>CHARGEMENT</Text>}
+                    :<Text style={styles.confirmButton}>CHARGEMENT</Text>}
+                
                 </ImageBackground>           
             )
         }
