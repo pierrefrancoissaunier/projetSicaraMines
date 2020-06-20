@@ -19,10 +19,14 @@ export default class AffichePhotoGallery extends React.Component {
 
     state = {
         image: {uri: this.props.navigation.state.params.item.uri},
+        modele: this.props.navigation.state.params.modele, //vaut true pour local
         isTfReady: false,
         isModelReady: false,
         predictions: null
     }
+
+
+    modeleLocalLabels = ["airplane","automobile","bird","cat","deer","dog","frog","horse","ship","truck"]
 
 
     static navigationOptions = {
@@ -33,17 +37,24 @@ export default class AffichePhotoGallery extends React.Component {
         console.log('debut')
         
         await tf.ready()
-        this.setState({ isTfReady: true })
-        console.log(this.state.isTfReady);
-        this.model = await mobilenet.load()
-        this.setState({ isModelReady: true })
-        console.log(this.state.isModelReady);
-        modelJson = require('C:/Users/User/essai/classifier_model/model.json');
-        modelWeights = require('C:/Users/User/essai/classifier_model/group1-shard1of1.bin');
-        this.localModel = await tf.loadLayersModel(bundleResourceIO(modelJson, modelWeights));
-        console.log('model local chargé')
+
+        if (!this.state.modele) {
+            this.model = await mobilenet.load()
+            this.setState({ isModelReady: true })
+    }
+        
+        
+        else {
+            modelJson = require('C:/Users/User/essai/classifier_model/model.json');
+            modelWeights = require('C:/Users/User/essai/classifier_model/group1-shard1of1.bin');
+            this.localModel = await tf.loadLayersModel(bundleResourceIO(modelJson, modelWeights));
+            this.setState({ isModelReady: true })
+        }
+        
     }
 
+
+    // Pour utiliser MobileNet, les trois fonctions suivantes.
     imageToTensor(rawImageData) {
         const TO_UINT8ARRAY = true
         const { width, height, data } = jpeg.decode(rawImageData, TO_UINT8ARRAY)
@@ -72,7 +83,7 @@ export default class AffichePhotoGallery extends React.Component {
             const rawImageData = await response.arrayBuffer()
             const imageTensor = this.imageToTensor(rawImageData)
             const predictions = await this.model.classify(imageTensor)
-            this.setState({ predictions })
+            this.standardizePredictionsMobileNet(predictions)
             console.log(predictions)
             
         } catch (error) {
@@ -80,6 +91,14 @@ export default class AffichePhotoGallery extends React.Component {
         }
     }
 
+    standardizePredictionsMobileNet(predictions){
+        this.setState({ predictions : 
+            'MobileNet détecte : ' + predictions[0].className + "\n" +
+            'Ou alors : ' + predictions[1].className })
+    }
+
+
+    // Pour utiliser le modèle interne
 
     classifyImageLocal = async () => {
         try{
@@ -89,7 +108,7 @@ export default class AffichePhotoGallery extends React.Component {
                 { compress: 1, format: SaveFormat.JPEG },
             );
             
-            const fileUri = result.uri;   
+            const fileUri = result.uri;  
             const imgB64 = await FileSystem.readAsStringAsync(fileUri, {
                 encoding: FileSystem.EncodingType.Base64,
             });
@@ -97,12 +116,21 @@ export default class AffichePhotoGallery extends React.Component {
             const raw = new Uint8Array(imgBuffer)  
             const imageTensor = decodeJpeg(raw).expandDims();
             const predictions = (await this.localModel.predict(imageTensor).array());
-            // this.setState({ predictions });
-            console.log('predictions : ', predictions[0])
+            this.standardizePredictionsLocal(predictions[0])
         }   
          catch (error) {
             console.log(error)
         }
+    }
+
+    standardizePredictionsLocal(predictions){
+        let result
+        for (let i = 0; i < predictions.length; i++ ) {
+            if ( predictions[i] == 1 ){
+                result = 'Le modèle local détecte : ' + this.modeleLocalLabels[i]
+            }
+        }
+        this.setState({ predictions: result })
     }
 
     render() {
@@ -113,28 +141,23 @@ export default class AffichePhotoGallery extends React.Component {
             return(
                 <ImageBackground source={item} style={styles.preview}>
                     
-                    {(isTfReady && isModelReady) ? // test ternaire pas facile à lire 
-                    <TouchableOpacity style={styles.confirmButton} onPress={ () => {
-                        this.classifyImage()
-                    }}>
-                        <Ionicons name="ios-send" color="white" size={60} />
+                    {isModelReady    ? // test ternaire pas facile à lire 
+                    
+                    <TouchableOpacity 
+                    style={styles.confirmButton}
+                    onPress= { () => { this.classifyImageLocal() }}>
+                        <Ionicons name="ios-send" color="white" size={60} />                   
                     </TouchableOpacity>
-                    :<Text style={styles.confirmButton}>CHARGEMENT</Text>}
+                    :<Text style={{marginTop:400, backgroundColor:'white'}}>Loading</Text>}
                 
                 </ImageBackground>           
             )
         }
         return(
-            <ImageBackground source={item} style={styles.preview}>
-                <Text style={{marginTop: 20}}> 
-                    Plus probable : {predictions[0].className} {"\n"}
-                    Ou alors : {predictions[1].className}, {"\n"} {predictions[2].className}
+            <ImageBackground source={image} style={{flex: 1}}>
+                <Text style={{marginTop: 25, backgroundColor: 'white'}}> 
+                    {predictions}
                 </Text>
-                <TouchableOpacity style={styles.confirmButton} onPress={ () => {
-                    this.classifyImage();
-                    }}>
-                     <Ionicons name="ios-send" color="white" size={60}/>
-                </TouchableOpacity>
             </ImageBackground>           
         )
     }

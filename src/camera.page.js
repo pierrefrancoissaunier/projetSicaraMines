@@ -22,7 +22,7 @@ export default class CameraPage extends React.Component {
         capturing: null,
         hasCameraPermission: null,
         cameraType: Camera.Constants.Type.back,
-        flashMode: Camera.Constants.FlashMode.off,
+        flashMode: Camera.Constants.FlashMode.off
     };
 
     setFlashMode = (flashMode) => this.setState({ flashMode });
@@ -67,11 +67,19 @@ export default class CameraPage extends React.Component {
 
         if (this.state.lastCapture){
             return(
-                <GestureRecognizer onSwipe={() => this.setState({lastCapture: null})}>
-                    <ImageBackground source={this.state.lastCapture} style={styles.preview} >
-                        <TouchableOpacity style={styles.confirmButton} onPress={this.confirmCapture}>
-                            <MaterialCommunityIcons name='send' color="white" size={60} 
-                            />
+                <GestureRecognizer 
+                onSwipe={() => this.setState({lastCapture: null})}>
+                    
+                    <ImageBackground
+                    source={this.state.lastCapture}
+                    style={styles.preview} >
+                        
+                        <TouchableOpacity
+                        style={styles.confirmButton}
+                        onPress={this.confirmCapture}>
+                    
+                            <MaterialCommunityIcons name='send' color="white" size={60} />
+                        
                         </TouchableOpacity>
                     </ImageBackground>
                 </GestureRecognizer>)
@@ -81,27 +89,27 @@ export default class CameraPage extends React.Component {
         return (
             
             <React.Fragment>
-            <GestureRecognizer onSwipeLeft={() => this.props.navigation.navigate('Gallery', {captures: captures}) }>
-            <View>
-                    <Camera
+                <GestureRecognizer onSwipeLeft={() => this.props.navigation.navigate('Gallery', {captures: captures}) }>
+                    <View>                     
+                        <Camera
                         type={cameraType}
                         flashMode={flashMode}
                         style={styles.preview}
-                        ref={camera => this.camera = camera}
-                    />
-            </View> 
+                        ref={camera => this.camera = camera}>
+                        </Camera>
+                    </View> 
 
-            </GestureRecognizer>
+                </GestureRecognizer>
                 <Toolbar 
-                    capturing={capturing}
-                    flashMode={flashMode}
-                    cameraType={cameraType}
-                    setFlashMode={this.setFlashMode}
-                    setCameraType={this.setCameraType}
-                    onCaptureIn={this.handleCaptureIn}
-                    onCaptureOut={this.handleCaptureOut}
-                    onLongCapture={this.handleLongCapture}
-                    onShortCapture={this.handleShortCapture}
+                capturing={capturing}
+                flashMode={flashMode}
+                cameraType={cameraType}
+                setFlashMode={this.setFlashMode}
+                setCameraType={this.setCameraType}
+                onCaptureIn={this.handleCaptureIn}
+                onCaptureOut={this.handleCaptureOut}
+                onLongCapture={this.handleLongCapture}
+                onShortCapture={this.handleShortCapture}
                 />
             
             </React.Fragment>

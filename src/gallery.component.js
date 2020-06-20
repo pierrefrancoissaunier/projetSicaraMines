@@ -1,28 +1,55 @@
 import React from 'react';
-import { Image, TouchableOpacity } from 'react-native';
+import { Image, TouchableOpacity, Text, Button } from 'react-native';
 import styles from './styles';
 import { FlatList } from 'react-native-gesture-handler';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 
 export default class Gallerie extends React.Component {
-    render() {
+    state = {
+        modele: true
+    }
 
-        const captures = this.props.navigation.state.params.captures
+
+    static navigationOptions = {
+        headerShown: false
+    };
+
+    captures = this.props.navigation.state.params.captures.reverse()
+    
+    render() {
 
         return(
             <React.Fragment>
-            <FlatList
-                    data={captures.reverse()} //reverse pour affichage avec photo ancienne en haut
-                    renderItem={({item}) => (
+                {/* <TouchableOpacity
+                    style={{marginTop: 30, backgroundColor:'yellow', alignItems:'center', height:30, justifyContent:'center'}}
+                    onPress={() => this.setState({modele: !this.state.modele})}>
+                    <Text style={{height: 20}}>
+                        {this.state.modele ? 'Modèle local. Rapide mais peu précis ' : 'Mobilenet. Précis mais lent' } 
+                    </Text>
+                </TouchableOpacity> */}
+                <Text style={{marginTop:20}}></Text>
+                <Button
+                title={ 'Modèle : (Cliquer pour changer)' + '\n' + 
+                    (this.state.modele ?
+                    'Modèle local. Rapide mais peu précis'
+                    : 'Mobilenet. Précis mais lent')
+                }
+                onPress={() => this.setState({ modele: !this.state.modele }) } />
+                <FlatList
+                data={this.captures}
+                renderItem={
+                    ({item}) =>
 
-                        // on fait un bouton pour zoomer sur l'image
-                        <TouchableOpacity style={styles.galleryImageContainer}
-                            onPress={() => this.props.navigation.navigate('AffichePhotoGallery', {item: item})}>
-                        <Image source={item} style={styles.galleryImage} />      
+                        <TouchableOpacity
+                        style={styles.galleryImageContainer}
+                        onPress={() => this.props.navigation.navigate('AffichePhotoGallery', {item: item, modele: this.state.modele})}>
+                            <Image source={item} style={styles.galleryImage} />      
                         </TouchableOpacity>
-                        )}
-                    keyExtractor={(item) => item.toString()} // à l'uri on associe luimeme comme key pour pas d'erreur jaune
-                    numColumns={4}
-                    />
+                }
+                keyExtractor={(item) => item.toString()} // à l'uri on associe luimeme comme key pour pas d'erreur jaune
+                numColumns={4}
+                />
             </React.Fragment>
 
         )
