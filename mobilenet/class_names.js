@@ -1,5 +1,6 @@
-export const CLASSES = 
-{ 0: 'pink primrose',
+export const CLASSES =
+{
+  0: 'pink primrose',
   1: 'hard-leaved pocket orchid',
   2: 'canterbury bells',
   3: 'sweet pea',
@@ -100,4 +101,5 @@ export const CLASSES =
   98: 'bromelia',
   99: 'blanket flower',
   100: 'trumpet creeper',
-  101: 'blackberry lily'};
+  101: 'blackberry lily'
+}
