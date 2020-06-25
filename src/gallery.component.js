@@ -6,11 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 
 export default class Gallerie extends React.Component {
-    state = {
-        modele: true
-    }
-
-
+    
     static navigationOptions = {
         headerShown: false
     };
@@ -21,21 +17,7 @@ export default class Gallerie extends React.Component {
 
         return(
             <React.Fragment>
-                {/* <TouchableOpacity
-                    style={{marginTop: 30, backgroundColor:'yellow', alignItems:'center', height:30, justifyContent:'center'}}
-                    onPress={() => this.setState({modele: !this.state.modele})}>
-                    <Text style={{height: 20}}>
-                        {this.state.modele ? 'Modèle local. Rapide mais peu précis ' : 'Mobilenet. Précis mais lent' } 
-                    </Text>
-                </TouchableOpacity> */}
                 <Text style={{marginTop:20}}></Text>
-                <Button
-                title={ 'Modèle : (Cliquer pour changer)' + '\n' + 
-                    (this.state.modele ?
-                    'Modèle local. Rapide mais peu précis'
-                    : 'Mobilenet. Précis mais lent')
-                }
-                onPress={() => this.setState({ modele: !this.state.modele }) } />
                 <FlatList
                 data={this.captures}
                 renderItem={
@@ -43,7 +25,7 @@ export default class Gallerie extends React.Component {
 
                         <TouchableOpacity
                         style={styles.galleryImageContainer}
-                        onPress={() => this.props.navigation.navigate('AffichePhotoGallery', {item: item, modele: this.state.modele})}>
+                        onPress={() => this.props.navigation.navigate('AffichePhotoGallery', {item: item})}>
                             <Image source={item} style={styles.galleryImage} />      
                         </TouchableOpacity>
                 }

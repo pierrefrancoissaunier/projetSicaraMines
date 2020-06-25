@@ -58,6 +58,7 @@ export default class App extends React.Component {
 //   imageToTensor(rawImageData) {
 //     const TO_UINT8ARRAY = true
 //     const { width, height, data } = jpeg.decode(rawImageData, TO_UINT8ARRAY)
+//     console.log(width, height)
 //     // Drop the alpha channel info for mobilenet
 //     const buffer = new Uint8Array(width * height * 3)
 //     let offset = 0 // offset into original data
@@ -75,7 +76,6 @@ export default class App extends React.Component {
 //   classifyImage = async () => {
 //     try {
 //       const imageAssetPath = Image.resolveAssetSource(this.state.image)
-//       console.log('imageeee', imageAssetPath)
 //       const response = await fetch(imageAssetPath.uri, {}, { isBinary: true })
 //       const rawImageData = await response.arrayBuffer()
 //       const imageTensor = this.imageToTensor(rawImageData)

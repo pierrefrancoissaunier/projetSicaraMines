@@ -30,9 +30,9 @@ export default StyleSheet.create({
         width: winWidth/4,
         alignItems: 'center',
         position: 'absolute',
-        height: 100,
-        bottom: 0,
+        height: 80,
         color: '#f0f',
+        bottom: 0
     },
 
     captureBtn: {
