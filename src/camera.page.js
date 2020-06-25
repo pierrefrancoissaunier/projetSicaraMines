@@ -3,12 +3,13 @@ import { Camera } from 'expo-camera';
 import {
   View, Text, ImageBackground, Image, TouchableOpacity,
   ActivityIndicator, Dimensions, ScrollView, KeyboardAvoidingView,
-  TouchableWithoutFeedback, Keyboard } from 'react-native';
+  TouchableWithoutFeedback, Keyboard, Button } from 'react-native';
 import * as Permissions from 'expo-permissions';
 import * as tf from '@tensorflow/tfjs';
 import { fetch, decodeJpeg, bundleResourceIO } from '@tensorflow/tfjs-react-native';
 import * as mobilenet from '@tensorflow-models/mobilenet';
 import * as FileSystem from 'expo-file-system';
+import { Ionicons } from '@expo/vector-icons'
 
 import * as jpeg from 'jpeg-js';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
@@ -78,7 +79,7 @@ export default class CameraPage extends React.Component {
       this.modelMobileNet = await mobilenet.load();
 
       const modelJson = require('../classifier_model/model.json');
-      const modelWeights = require('../essai/classifier_model/group1-shard1of1.bin');
+      const modelWeights = require('../classifier_model/group1-shard1of1.bin');
       this.localModel = await tf.loadLayersModel(bundleResourceIO(modelJson, modelWeights));
       this.setState({ areModelsReady: true });
     }
@@ -205,59 +206,79 @@ export default class CameraPage extends React.Component {
 
       // ainsi qu'une liste pour confirmer la prédiction
       if (this.state.lastCapture) {
-        
         return (
-        
-        <KeyboardAvoidingView behavior='padding'>
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <ImageBackground
-          source={this.state.lastCapture}
-          style={{ justifyContent:'flex-end', flexDirection:'column', alignItems: 'center', height: winHeight, width: winWidth }}
-          >
-            <GestureRecognizer
-            onSwipe={() => this.setState({ lastCapture: null })}
-            >
-
-            </GestureRecognizer>
-              <View style={{height:'20%', width:'100%', marginBottom: 35}}>
-                <ScrollView contentContainerStyle={{ backgroundColor: 'white'}}>
-                  
-
-
-                  <View style={{flexDirection: 'row'}}>
-                    <TouchableOpacity style={{flex: 5}} onPress={() => this.setState({choix: 1})}>
-                      <Text>Mobilenet (1): {this.state.pred1} </Text>
-                    </TouchableOpacity>
-                    {this.state.choix == 1 && <Text style={{flex: 1}}>✅</Text>}
-                  </View>
-                  
-                  <View style={{flexDirection: 'row'}}>
-                    <TouchableOpacity style={{flex: 5}} onPress={() => this.setState({choix: 2})}>
-                      <Text>Mobilenet (2): {this.state.pred2}</Text>
-                    </TouchableOpacity>
-                    {this.state.choix == 2 && <Text style={{flex: 1}}>✅</Text>}
-                  </View>
-                  
-                  <View style={{flexDirection: 'row'}}>
-                    <TouchableOpacity style={{flex: 5}} onPress={() => this.setState({choix: 3})}>
-                      <Text>Modèle local: {this.state.pred3}</Text>
-                    </TouchableOpacity>
-                    {this.state.choix == 3 && <Text style={{flex: 1}}>✅</Text>}
-                  </View>
-
-                  <View style={{flexDirection: 'row'}}>
-                    <TextInput
-                    style={{width: '100%'}}
-                    placeholder='Ou proposez un label :'
-                    autoCorrect= {false}
-                    onSubmitEditing={(text) => {this.setState({ kkk: text}); console.log(text)} }/>
-                  </View>
-                </ScrollView>
-              </View>
+          <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
             
-          </ImageBackground>
-          </TouchableWithoutFeedback>
-          </KeyboardAvoidingView>
+            <ImageBackground
+            source={this.state.lastCapture}
+            style={{ justifyContent:'flex-end', flexDirection:'column', alignItems: 'center', height: winHeight, width: winWidth }}
+            >
+        
+                <ScrollView style={{marginTop: 20}}>
+            
+                  <View style={{flexDirection: 'row', alignItems: 'center', height:30}}>
+                    <View style={{width: '80%'}}>
+                      <TouchableOpacity style={{alignSelf: 'center'}} onPress={() => this.setState({choix: 1})}>
+                        <Text style={{ backgroundColor: 'white', }}>Mobilenet (1): {this.state.pred1? this.state.pred1 : '❓'}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={{width: '20%', justifyContent:'center', alignItems:'center'}}>
+                      <Text>{this.state.choix == 1 ? '✅' : ''}</Text>
+                    </View>
+                  </View>
+              
+                  <View style={{flexDirection: 'row', alignItems: 'center', height:30}}>
+                    <View style={{width: '80%'}}>
+                      <TouchableOpacity style={{alignSelf: 'center'}} onPress={() => this.setState({choix: 2})}>
+                        <Text style={{backgroundColor: 'white'}}>Mobilenet (2): {this.state.pred2? this.state.pred2 : '❓'}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={{width: '20%', justifyContent:'center', alignItems:'center'}}>
+                      <Text>{this.state.choix == 2 ? '✅' : ''}</Text>
+                    </View>
+                  </View>
+
+                  <View style={{flexDirection: 'row', alignItems: 'center', height:30}}>
+                    <View style={{width: '80%'}}>
+                      <TouchableOpacity style={{alignSelf: 'center'}} onPress={() => this.setState({choix: 3})}>
+                        <Text style={{backgroundColor: 'white'}}>Modèle local : {this.state.pred3}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={{width: '20%', justifyContent:'center', alignItems:'center'}}>
+                      <Text>{this.state.choix == 3 ? '✅' : ''}</Text>
+                    </View>
+                  </View>
+              
+                  <View style={{flexDirection: 'row', alignItems: 'center', height:30}}>
+                    <View style={{width: '80%'}}>
+                      <TextInput
+                      style={{ alignSelf:'center', backgroundColor: 'white'}}
+                      placeholder='Ou proposez un label :'
+                      autoCorrect= {false}
+                      onSubmitEditing={() => {this.setState({ choix: 4})} }
+                      onFocus={() => this.setState({choix: 4})}/>
+                    </View>
+                    <View style={{width: '20%', justifyContent:'center', alignItems:'center'}}>
+                      <Text>{this.state.choix == 4 ? '✅' : ''}</Text>
+                    </View>
+                  </View>
+
+                </ScrollView>
+                
+                <GestureRecognizer
+                onSwipe={() => this.setState({ lastCapture: null, pred1: null, pred2: null, pred3: null })}
+                
+                >
+                  <TouchableOpacity 
+                  style={styles.confirmButton}
+                  onPress= { () => {console.log('oki')}}>
+                    <Ionicons name="ios-send" color="white" size={60} />                   
+                  </TouchableOpacity>
+                </GestureRecognizer>
+
+            </ImageBackground>
+
+          </TouchableWithoutFeedback>        
         );
       }
 
