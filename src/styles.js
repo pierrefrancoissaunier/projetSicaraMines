@@ -81,4 +81,12 @@ export default StyleSheet.create({
         flexDirection: 'column',
         alignItems: 'center'
     },
+
+    affichePred: {
+        backgroundColor:'white',
+        alignSelf: 'center',
+        padding:5,
+        backgroundColor:'white',
+        borderRadius:10,
+        borderWidth: 1}
 });

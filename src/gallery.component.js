@@ -6,35 +6,27 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 
 export default class Gallerie extends React.Component {
+
+  captures = this.props.navigation.state.params.captures.reverse()
     
-    static navigationOptions = {
-        headerShown: false
-    };
+  render() {
 
-    captures = this.props.navigation.state.params.captures.reverse()
-    
-    render() {
+    return(
+      <React.Fragment>
+        <FlatList data={this.captures} numColumns={4}
+        keyExtractor={(item) => item.uri.toString()} // à l'uri on associe luimeme comme key pour pas d'erreur jaune
+        renderItem={({item}) =>
+                
+          <TouchableOpacity style={styles.galleryImageContainer}
+          onPress={() => this.props.navigation.navigate('AffichePhotoGallery', {item: item})}>
+            <Image source={item.uri} style={styles.galleryImage}/>      
+          </TouchableOpacity>
+        
+        }
+        />
+      
+      </React.Fragment>
 
-        return(
-            <React.Fragment>
-                <Text style={{marginTop:20}}></Text>
-                <FlatList
-                data={this.captures}
-                renderItem={
-                    ({item}) =>
-
-                        <TouchableOpacity
-                        style={styles.galleryImageContainer}
-                        onPress={() => this.props.navigation.navigate('AffichePhotoGallery', {item: item})}>
-                            <Image source={item} style={styles.galleryImage} />      
-                        </TouchableOpacity>
-                }
-                keyExtractor={(item) => item.toString()} // à l'uri on associe luimeme comme key pour pas d'erreur jaune
-                numColumns={4}
-                />
-            </React.Fragment>
-
-        )
-    }
-
+    )
+  }
 }
