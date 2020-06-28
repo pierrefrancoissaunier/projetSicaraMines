@@ -1,11 +1,12 @@
 {
   "expo": {
-    "name": "essai",
-    "slug": "essai",
+    "name": "essai_PI",
+    "slug": "essai_pi",
     "platforms": [
       "ios",
       "android",
-      "web"],
+      "web"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -22,6 +23,7 @@
     ],
     "ios": {
       "supportsTablet": true
-    }
+    },
+    "description": ""
   }
 }
