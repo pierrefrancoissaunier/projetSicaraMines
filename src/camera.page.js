@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, ImageBackground, Image, TouchableOpacity,
   ActivityIndicator, Dimensions, ScrollView,
-  TouchableWithoutFeedback, Keyboard } from 'react-native';
+  TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
-import { TextInput } from 'react-native-gesture-handler';
+import Autocomplete from 'react-native-autocomplete-input'
 import { Ionicons } from '@expo/vector-icons'
 import Toolbar from './toolbar.component';
 import styles from './styles';
@@ -40,7 +40,8 @@ export default class CameraPage extends React.Component {
     cameraType: Camera.Constants.Type.back,
     flashMode: Camera.Constants.FlashMode.off,
     areModelsReady: false,
-    choix: 1
+    choix: 1,
+    pred4: ''
   };
 
 
@@ -191,12 +192,22 @@ export default class CameraPage extends React.Component {
   
   };
 
+  findLabel(text) {
+    if (text===''){
+      return [];
+    }
+    const labels = this.modeleLocalLabels
+    const regex = new RegExp(`${text.trim()}`, 'i');
+    return labels.filter(label => label.search(regex) >= 0);
+  }; 
+
   // affichage de l'écran
   render() {
     const { hasCameraPermission, flashMode, cameraType,
       capturing, captures, predictionsText } = this.state;
     const { width: winWidth, height: winHeight } = Dimensions.get('window');
-
+    const labels = this.findLabel(this.state.pred4)
+    const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
     // si l'on n'a pas les permissions
     if (hasCameraPermission === null) {
       return <View />;
@@ -215,12 +226,9 @@ export default class CameraPage extends React.Component {
     }
 
 
-    // this this.state.lastCapture est non vide,
+    // si this.state.lastCapture est non vide,
     // c'est que l'on a pris une photo. C'est donc l'affichage
     // de l'écran freezé avec la possibilité de choisir une prédiction
-
-    // On encapsule par un gestureRecognizer : si l'on swipe
-    // dans nimporte quel sens, la photo prise est supprimée
 
     // l'image en fond est l'image prise
 
@@ -232,14 +240,14 @@ export default class CameraPage extends React.Component {
     if (this.state.lastCapture) {
       return (
         <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
-          
           <ImageBackground
           source={this.state.lastCapture}
-          style={{ justifyContent:'space-between', flexDirection:'column', alignItems: 'center', height: winHeight, width: winWidth }}
-          >
-      
-              <ScrollView style={{marginTop: 20, height:'25%'}}>
-          
+          style={{ justifyContent:'space-between', flexDirection:'column', alignItems: 'center', height: winHeight, width: winWidth }}>
+            
+            <View style={{marginTop: 20, height:'25%'}}>
+              <ScrollView>
+
+                {/* Prédiction MobileNet 1 */}
                 <View style={{flexDirection: 'row', alignItems: 'center', height:30}}>
                   <View style={{width: '80%'}}>
                     <TouchableOpacity
@@ -256,7 +264,7 @@ export default class CameraPage extends React.Component {
                     </Text>
                   </View>
                 </View>
-            
+                 {/* Prédiction MobileNet 2 */}
                 <View style={{flexDirection: 'row', alignItems: 'center', height:30}}>
                   <View style={{width: '80%'}}>
                     <TouchableOpacity
@@ -274,6 +282,7 @@ export default class CameraPage extends React.Component {
                   </View>
                 </View>
 
+                {/* Prédiction modèle local */}
                 <View style={{flexDirection: 'row', alignItems: 'center', height:30}}>
                   <View style={{width: '80%'}}>
                     <TouchableOpacity
@@ -290,44 +299,54 @@ export default class CameraPage extends React.Component {
                     </Text>
                   </View>
                 </View>
-            
-                <View style={{flexDirection: 'row', alignItems: 'center', height:30}}>
-                  <View style={{width: '80%'}}>
-                    <TextInput
-                    style={styles.affichePred}
-                    placeholder='Ou proposez un label :'
-                    autoCorrect={false}
-                    onChangeText={text => {this.setState({ pred4: text})} }
-                    onFocus={() => this.setState({choix: 4})}/>
-                  </View>
-                  <View style={{width: '20%', justifyContent:'center', alignItems:'center'}}>
-                    <Text>
-                      {this.state.choix == 4 ? '✅' : ''}
-                    </Text>
-                  </View>
-                </View>
-
+                
               </ScrollView>
-
+              
+              {/* Proposition de label */}
+              <View style={{flexDirection: 'row', alignItems: 'center', height:30}}>
+                <View style={{width: '80%'}}>
+                  <Autocomplete
+                    inputContainerStyle={{borderRadius: 10}}
+                    data={labels.length===1 && comp(this.state.pred4, labels[0]) ? [] : labels}
+                    onChangeText={text => this.setState({pred4: text})}
+                    keyExtractor={({item}) => item}
+                    placeholder='Ou proposez un label :'
+                    onFocus={() => this.setState({ choix: 4 })}
+                    renderItem={({item}) => (
+                        <TouchableOpacity onPress={() => this.setState({pred4: item})}>
+                          <Text>{item}</Text>
+                        </TouchableOpacity>
+                    )}
+                  />
+                </View>
+                <View style={{width: '20%', justifyContent:'center', alignItems:'center'}}>
+                  <Text>
+                    {this.state.choix == 4 ? '✅' : ''}
+                  </Text>
+                </View>
+              </View>
+            </View>
+            
+            {/* Boutons d'envoi et de suppression  */}
+            <View>
               <TouchableOpacity
               onPress= { () => this.confirmCapture()}>
                 <Ionicons name="ios-send" color="white" size={60} />                   
               </TouchableOpacity>
 
               <TouchableOpacity
-
-              onPress= { () => this.setState({ lastCapture: null, pred1: null, pred2: null, pred4: ''})}>
+              onPress= { () => this.setState({ lastCapture: null, pred1: null, pred2: null, pred4: null})}>
                 <Ionicons name="ios-trash" color="white" size={30} />                   
               </TouchableOpacity>
-
+            </View>
+          
           </ImageBackground>
-
-        </TouchableWithoutFeedback>        
+        </TouchableWithoutFeedback>  
       );
     }
 
-    // le test lastCapture est passé, cest ici l'écran par défaut
-    // ie l'écran basique de la caméra avec la toolbar
+    {/* Ici, l'écran basique de la caméra 
+        avec une reconnaissance de geste pour glisser vers la gallerie */}
     return (
 
       <>
