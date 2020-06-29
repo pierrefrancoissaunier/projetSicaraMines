@@ -187,7 +187,7 @@ export default class CameraPage extends React.Component {
     
     this.setState({
       captures: [new_item, ...this.state.captures],
-      lastCapture: null, pred1: null, pred2: null, pred3: null
+      lastCapture: null, pred1: null, pred2: null, pred3: null, pred4: ''
     });
   
   };
@@ -308,6 +308,7 @@ export default class CameraPage extends React.Component {
                   <Autocomplete
                     inputContainerStyle={{borderRadius: 10}}
                     data={labels.length===1 && comp(this.state.pred4, labels[0]) ? [] : labels}
+                    defaultValue={this.state.pred4}
                     onChangeText={text => this.setState({pred4: text})}
                     keyExtractor={({item}) => item}
                     placeholder='Ou proposez un label :'
