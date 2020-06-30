@@ -19,10 +19,11 @@ import * as FileSystem from 'expo-file-system';
 import * as jpeg from 'jpeg-js';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
+import {connect} from 'react-redux'
 
 
 
-export default class CameraPage extends React.Component {
+class CameraPage extends React.Component {
     
   camera = null;
 
@@ -189,14 +190,15 @@ export default class CameraPage extends React.Component {
       captures: [new_item, ...this.state.captures],
       lastCapture: null, pred1: null, pred2: null, pred3: null, pred4: ''
     });
-  
+    const action = {type: 'ADD_LABEL', label: label};
+    this.props.dispatch(action)
   };
 
   findLabel(text) {
     if (text===''){
       return [];
     }
-    const labels = this.modeleLocalLabels
+    const labels = this.props.labelsArray
     const regex = new RegExp(`${text.trim()}`, 'i');
     return labels.filter(label => label.search(regex) >= 0);
   }; 
@@ -336,7 +338,7 @@ export default class CameraPage extends React.Component {
               </TouchableOpacity>
 
               <TouchableOpacity
-              onPress= { () => this.setState({ lastCapture: null, pred1: null, pred2: null, pred4: null})}>
+              onPress= { () => this.setState({ lastCapture: null, pred1: null, pred2: null, pred4: ''})}>
                 <Ionicons name="ios-trash" color="white" size={30} />                   
               </TouchableOpacity>
             </View>
@@ -378,3 +380,11 @@ export default class CameraPage extends React.Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    labelsArray: state.labelsArray   
+  }
+}
+
+export default connect(mapStateToProps)(CameraPage)

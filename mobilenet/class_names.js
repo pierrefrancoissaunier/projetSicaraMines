@@ -1,4 +1,4 @@
-export const CLASSES = 
+const CLASSES = 
 { 0: 'pink primrose',
   1: 'hard-leaved pocket orchid',
   2: 'canterbury bells',
@@ -101,3 +101,5 @@ export const CLASSES =
   99: 'blanket flower',
   100: 'trumpet creeper',
   101: 'blackberry lily'};
+
+  export default CLASSES
