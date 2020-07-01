@@ -183,6 +183,30 @@ class CameraPage extends React.Component {
       default:
         console.log('Erreur de confirmation')        
     }
+    envoiimage = async () => {
+      const imgB64 = await FileSystem.readAsStringAsync(this.state.lastCapture.uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      const uploadPhoto = new FormData();
+    uploadPhoto.append('name', label );
+    uploadPhoto.append('photo', imgB64);
+    fetch('http://192.168.1.24:8000/storage/photos/',{
+      method:'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+      body: uploadPhoto })
+    
+    .then((res) => {
+      console.log(res);
+    })
+    .catch(error => {
+      console.log(error);
+    })
+      
+   }
+    envoiimage();
 
     const new_item = { uri: this.state.lastCapture, label: label }
     
