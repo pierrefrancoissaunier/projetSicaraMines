@@ -221,8 +221,10 @@ class CameraPage extends React.Component {
     if (!this.state.areModelsReady) {
       return (
         <View style={{ alignItems: 'center', flex: 1, justifyContent: 'center' }}>
-          <Text style={{ textAlign: 'center', height: 40 }}>Chargement des modèles ...</Text>
-          <ActivityIndicator size="large" />
+          <Text style={{ textAlign: 'center', height: 40 }}>
+            Chargement des modèles ...
+          </Text>
+          <ActivityIndicator size="large"/>
         </View>
       );
     }
